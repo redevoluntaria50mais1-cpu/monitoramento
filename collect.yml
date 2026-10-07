@@ -1,0 +1,40 @@
+name: coleta-a-cada-2h
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"   # a cada 2 horas (UTC); o GitHub pode atrasar alguns minutos
+  workflow_dispatch: {}      # permite rodar manualmente
+
+permissions:
+  contents: write
+
+concurrency:
+  group: coleta
+  cancel-in-progress: false
+
+jobs:
+  coleta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Coletar contadores de hashtags
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: python collect_counts.py
+
+      - name: Coletar painel de perfis
+        continue-on-error: true
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: python collect_panel.py
+
+      - name: Salvar dados
+        run: |
+          git config user.name "coleta-bot"
+          git config user.email "coleta-bot@users.noreply.github.com"
+          git add counts.js counts_history.json panel.js panel_state.json panel_history.json
+          git diff --staged --quiet || (git commit -m "coleta $(date -u +%Y-%m-%dT%H:%MZ)" && git push)

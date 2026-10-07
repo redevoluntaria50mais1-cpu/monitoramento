@@ -1,0 +1,182 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Volume de conversa: Lula x Bolsonaro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="counts.js"></script>
+<script src="panel.js" onerror="window.PANEL=[]"></script>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--card:#f5f5f4;--l:#d6336c;--b:#1c7ed6;--bd:#e3e3e0;--ok:#2b8a3e;--no:#c92a2a}
+@media(prefers-color-scheme:dark){:root{--bg:#161616;--fg:#eee;--mut:#9a9a9a;--card:#222;--l:#f06595;--b:#4dabf7;--bd:#333;--ok:#69db7c;--no:#ff8787}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,sans-serif;padding:20px;max-width:960px;margin:auto}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mut);margin-bottom:14px;font-size:14px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--bd)}
+.tab{background:none;border:0;color:var(--mut);font:inherit;padding:8px 14px;cursor:pointer;border-bottom:2px solid transparent}
+.tab.on{color:var(--fg);border-bottom-color:var(--l);font-weight:600}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px}.row .card{margin:0}
+.big{font-size:28px;font-weight:600}.lab{color:var(--mut);font-size:13px}
+select,input{font:inherit;padding:6px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--fg)}
+.ctl{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden;margin-top:8px}.bar>i{display:block;height:100%;background:var(--l)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--bd)}th:first-child,td:first-child{text-align:left}
+.ok{color:var(--ok);font-weight:600}.no{color:var(--no);font-weight:600}.warn{color:var(--mut);font-size:13px;margin-top:8px}
+canvas{max-height:280px}.hide{display:none}
+</style></head><body>
+<h1>Volume de conversa: Lula x Bolsonaro</h1>
+<div class="sub" id="upd">Carregando…</div>
+<div class="tabs"><button class="tab on" data-t="meta">Meta diária</button><button class="tab" data-t="vol">Volume por dia</button></div>
+<div class="ctl">
+ <label>Rede <select id="plat"><option value="all">Todas</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select></label>
+ <label>Meta: Lula = <input id="tgt" type="number" min="1" max="500" value="60" style="width:70px"> % do volume do Bolsonaro</label>
+</div>
+
+<section id="meta">
+ <div class="row">
+  <div class="card"><div class="lab">Posts novos hoje: Lula</div><div class="big" id="pl" style="color:var(--l)">–</div></div>
+  <div class="card"><div class="lab">Posts novos hoje: Bolsonaro</div><div class="big" id="pb" style="color:var(--b)">–</div></div>
+  <div class="card"><div class="lab">Lula como % do Bolsonaro (posts)</div><div class="big" id="pr">–</div><div class="bar"><i id="pbar"></i></div><div class="lab" id="pneed"></div></div>
+ </div>
+ <div class="row">
+  <div class="card"><div class="lab">Engajamento (views) hoje: Lula</div><div class="big" id="vl" style="color:var(--l)">–</div></div>
+  <div class="card"><div class="lab">Engajamento (views) hoje: Bolsonaro</div><div class="big" id="vb" style="color:var(--b)">–</div></div>
+  <div class="card"><div class="lab">Lula como % do Bolsonaro (views)</div><div class="big" id="vr">–</div><div class="bar"><i id="vbar"></i></div><div class="lab" id="vneed"></div></div>
+ </div>
+
+ <div class="row">
+  <div class="card"><div class="lab">Engajamento do painel hoje: Lula</div><div class="big" id="el" style="color:var(--l)">–</div><div class="lab" id="fl"></div></div>
+  <div class="card"><div class="lab">Engajamento do painel hoje: Bolsonaro</div><div class="big" id="eb" style="color:var(--b)">–</div><div class="lab" id="fb"></div></div>
+  <div class="card"><div class="lab">Lula como % do Bolsonaro (painel)</div><div class="big" id="er">–</div><div class="bar"><i id="ebar"></i></div><div class="lab" id="eneed"></div></div>
+ </div>
+ <div class="warn" id="pnote" style="margin:-4px 0 12px"></div>
+ <div class="card"><div class="lab" style="margin-bottom:6px">Painel por perfil (Instagram)</div><table id="byprof"></table>
+  <div class="lab" style="margin-top:6px">Eng. novo hoje = curtidas + comentários novos hoje. Média/post = dos últimos 12 posts. Eng/1k seg. = média por post a cada 1.000 seguidores (compara perfis de tamanhos diferentes).</div></div>
+ <div class="card" id="onecol" style="display:none"></div>
+ <div class="card"><div class="lab" style="margin-bottom:6px">Contadores atuais das hashtags (total acumulado, última coleta)</div><table id="tot"></table></div>
+ <div class="card"><canvas id="c1"></canvas></div>
+ <div class="card"><div class="lab" style="margin-bottom:6px">Acompanhamento do dia (acumulado a cada coleta, horário de Brasília)</div><table id="intra"></table><div class="lab" id="pace" style="margin-top:8px"></div></div>
+ <div class="card"><canvas id="c5"></canvas></div>
+
+ <div class="card"><div class="lab" style="margin-bottom:6px">Histórico de metas por dia</div><table id="hist"></table></div>
+</section>
+
+<section id="vol" class="hide">
+ <div class="card"><canvas id="c2"></canvas></div>
+ <div class="card"><canvas id="c3"></canvas></div>
+</section>
+
+<div class="warn">Volume = novos posts/views nas hashtags monitoradas (3 por lado, mesmo critério), calculado pela diferença entre contadores de hashtag. Não é o total das redes, e volume não mede favorabilidade. Engajamento = views (só TikTok fornece). Dia = horário de Brasília. Atualiza a cada 2h.</div>
+
+<script>
+const TZ="America/Sao_Paulo",$=id=>document.getElementById(id),D=window.COUNTS||[];
+const dayOf=ts=>new Date(ts).toLocaleDateString("en-CA",{timeZone:TZ});
+const hhmm=ts=>new Date(ts).toLocaleTimeString("pt-BR",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});
+const fmt=n=>Math.round(n).toLocaleString("pt-BR");
+let ch={};
+function series(){
+ const p=$("plat").value,rows=D.filter(r=>p==="all"||r.platform===p),snap={};
+ rows.forEach(r=>{(snap[r.ts]=snap[r.ts]||{lula:{posts:0,views:0},bolsonaro:{posts:0,views:0}});snap[r.ts][r.side].posts+=r.posts;snap[r.ts][r.side].views+=r.views});
+ return Object.keys(snap).sort().map(ts=>({ts,day:dayOf(ts),...snap[ts]}));
+}
+function baseline(S,day){ // último snapshot de um dia anterior; senão o primeiro do próprio dia
+ const prev=S.filter(s=>s.day<day);return prev.length?prev[prev.length-1]:S.find(s=>s.day===day);
+}
+const d=(a,b,side,m)=>Math.max(0,a[side][m]-b[side][m]);
+function drawChart(id,cfg){if(typeof Chart==="undefined")return;ch[id]&&ch[id].destroy();ch[id]=new Chart($(id),cfg)}
+function render(){
+ const S=series(),t=+$("tgt").value;
+ if(!S.length){$("upd").textContent="Sem dados ainda. A primeira coleta roda em até 2 horas.";return}
+ const last=S[S.length-1];$("upd").textContent="Última coleta: "+new Date(last.ts).toLocaleString("pt-BR",{timeZone:TZ})+" (Brasília)";
+ const css=getComputedStyle(document.documentElement),cl=css.getPropertyValue("--l"),cb=css.getPropertyValue("--b");
+ const today=last.day,base=baseline(S,today),todays=S.filter(s=>s.day===today);
+ const L={posts:d(last,base,"lula","posts"),views:d(last,base,"lula","views")},B={posts:d(last,base,"bolsonaro","posts"),views:d(last,base,"bolsonaro","views")};
+ const partial=!S.some(s=>s.day<today);
+ function card(m,idl,idb,idr,idbar,idneed){
+  $(idl).textContent=fmt(L[m]);$(idb).textContent=fmt(B[m]);
+  const r=B[m]>0?L[m]/B[m]*100:null;
+  $(idr).textContent=r===null?"–":r.toFixed(1)+"%";$(idr).className="big "+(r!==null&&r>=t?"ok":"no");
+  $(idbar).style.width=Math.min(100,r===null?0:r/t*100)+"%";
+  const need=t/100*B[m]-L[m];
+  $(idneed).textContent=r===null?"Sem base de comparação ainda.":(need>0?"Faltam "+fmt(need)+" para a meta de "+t+"%":"Meta de "+t+"% atingida");
+ }
+ card("posts","pl","pb","pr","pbar","pneed");card("views","vl","vb","vr","vbar","vneed");
+
+
+ // contadores acumulados da última coleta + aviso quando só há 1 coleta
+ (function(){
+  const p=$("plat").value,L=D.filter(r=>r.ts===last.ts&&(p==="all"||r.platform===p));
+  $("tot").innerHTML="<tr><th>Hashtag</th><th>Rede</th><th>Lado</th><th>Posts</th><th>Views</th></tr>"+L.map(r=>"<tr><td>#"+r.tag+"</td><td>"+r.platform+"</td><td>"+r.side+"</td><td>"+fmt(r.posts)+"</td><td>"+(r.views?fmt(r.views):"–")+"</td></tr>").join("");
+  const one=S.length<2,el=$("onecol");el.style.display=one?"block":"none";
+  if(one)el.innerHTML="<b>Só 1 coleta registrada.</b> Os números de “hoje” são a diferença entre coletas, então aparecem a partir da 2ª coleta (daqui a algumas horas). Por enquanto, veja os totais acumulados abaixo.";
+ })();
+
+
+ // acompanhamento dentro do dia
+ (function(){
+  const PN=(window.PANEL||[]).filter(r=>($("plat").value==="all"||r.platform===$("plat").value)&&dayOf(r.ts)===today);
+  const cum=(ts,side)=>PN.filter(r=>r.side===side&&new Date(r.ts)<=new Date(ts).getTime()+15*60000).reduce((a,r)=>a+r.new_eng,0);
+  const pc=(a,b)=>b>0?(a/b*100).toFixed(1)+"%":"–",
+   cell=(a,b)=>{const r=b>0?a/b*100:null;return"<td>"+fmt(a)+" / "+fmt(b)+"</td><td class='"+(r===null?"":(r>=t?"ok":"no"))+"'>"+pc(a,b)+"</td>"};
+  const rows=todays.map(s=>{const pl=d(s,base,"lula","posts"),pb=d(s,base,"bolsonaro","posts"),vl=d(s,base,"lula","views"),vb=d(s,base,"bolsonaro","views"),el=cum(s.ts,"lula"),eb=cum(s.ts,"bolsonaro");
+   return{h:hhmm(s.ts),pl,pb,vl,vb,el,eb,html:"<tr><td>"+hhmm(s.ts)+"</td>"+cell(pl,pb)+cell(vl,vb)+cell(el,eb)+"</tr>"}});
+  $("intra").innerHTML="<tr><th>Hora</th><th>Posts L / B</th><th>%</th><th>Views L / B</th><th>%</th><th>Eng. painel L / B</th><th>%</th></tr>"+rows.map(r=>r.html).join("");
+  // ritmo e projeção (linear, estimativa)
+  const parts=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date()),
+   h=Math.max(0.5,(+parts.find(x=>x.type==="hour").value%24)+(+parts.find(x=>x.type==="minute").value)/60),rem=24-h;
+  const rl=L.posts/h,rb=B.posts/h,pjL=rl*24,pjB=rb*24;
+  if(B.posts>0&&todays.length>1&&rem>0.25){
+   const need=Math.max(0,(t/100*pjB-L.posts)/rem);
+   $("pace").textContent="Ritmo até agora: Lula "+fmt(rl)+" posts/h, Bolsonaro "+fmt(rb)+" posts/h. Projeção do dia no ritmo atual: Lula "+fmt(pjL)+" × Bolsonaro "+fmt(pjB)+" ("+pc(pjL,pjB)+"). Para fechar em "+t+"%, o Lula precisaria de ~"+fmt(need)+" posts/h nas "+rem.toFixed(1)+"h que restam. Estimativa linear; o ritmo varia ao longo do dia.";
+  }else $("pace").textContent="Ritmo e projeção aparecem a partir da 2ª coleta do dia.";
+  const labs=rows.map(r=>r.h);
+  drawChart("c5",{type:"line",data:{labels:labs,datasets:[
+   {label:"Posts Lula (acum. hoje)",data:rows.map(r=>r.pl),borderColor:cl,tension:.25},{label:"Posts Bolsonaro (acum. hoje)",data:rows.map(r=>r.pb),borderColor:cb,tension:.25},
+   {label:"Eng. painel Lula",data:rows.map(r=>r.el),borderColor:cl,borderDash:[5,4],tension:.25,yAxisID:"y2"},{label:"Eng. painel Bolsonaro",data:rows.map(r=>r.eb),borderColor:cb,borderDash:[5,4],tension:.25,yAxisID:"y2"}]},
+   options:{scales:{y:{title:{display:true,text:"Posts"}},y2:{position:"right",grid:{drawOnChartArea:false},title:{display:true,text:"Engajamento"}}},plugins:{title:{display:true,text:"Evolução acumulada no dia"}}}});
+ })();
+ // breakdown por perfil
+ (function(){
+  const P=(window.PANEL||[]).filter(r=>$("plat").value==="all"||r.platform===$("plat").value),T=$("byprof");
+  if(!P.length){T.innerHTML="<tr><td>Sem dados do painel ainda. Rode collect_panel.py.</td></tr>";return}
+  const by={};P.slice().sort((a,b)=>a.ts<b.ts?-1:1).forEach(r=>{const k=r.platform+"|"+r.profile,o=by[k]=by[k]||{profile:r.profile,side:r.side,newEng:0,newPosts:0};
+   o.followers=r.followers;o.avg=r.avg_eng||0;if(dayOf(r.ts)===today){o.newEng+=r.new_eng;o.newPosts+=r.new_posts}});
+  const rows=Object.values(by).sort((a,b)=>b.newEng-a.newEng||b.avg-a.avg);
+  T.innerHTML="<tr><th>Perfil</th><th>Lado</th><th>Seguidores</th><th>Eng. novo hoje</th><th>Posts novos</th><th>Média/post</th><th>Eng/1k seg.</th></tr>"+
+   rows.map(o=>"<tr><td>"+o.profile+"</td><td style='color:"+(o.side==="lula"?cl:cb)+"'>"+(o.side==="lula"?"Lula":"Bolsonaro")+"</td><td>"+fmt(o.followers)+"</td><td>"+fmt(o.newEng)+"</td><td>"+o.newPosts+"</td><td>"+fmt(o.avg)+"</td><td>"+(o.followers?(o.avg/o.followers*1000).toFixed(2):"–")+"</td></tr>").join("");
+ })();
+ // painel de perfis (curtidas+comentários novos hoje, soma dos snapshots do dia) + seguidores do último snapshot
+ (function(){
+  const P=(window.PANEL||[]).filter(r=>$("plat").value==="all"||r.platform===$("plat").value),tod=P.filter(r=>dayOf(r.ts)===today);
+  const e={lula:0,bolsonaro:0};tod.forEach(r=>e[r.side]+=r.new_eng);
+  const lastTs=P.length?P.map(r=>r.ts).sort().pop():null,f={lula:0,bolsonaro:0},n={lula:0,bolsonaro:0};
+  P.filter(r=>r.ts===lastTs).forEach(r=>{f[r.side]+=r.followers;n[r.side]++});
+  if(!P.length){["el","eb","er"].forEach(i=>$(i).textContent="–");$("pnote").textContent="Painel de perfis ainda sem dados (a 1ª coleta só registra a base).";return}
+  $("el").textContent=fmt(e.lula);$("eb").textContent=fmt(e.bolsonaro);
+  $("fl").textContent=n.lula+" perfis · "+fmt(f.lula)+" seguidores";$("fb").textContent=n.bolsonaro+" perfis · "+fmt(f.bolsonaro)+" seguidores";
+  const r=e.bolsonaro>0?e.lula/e.bolsonaro*100:null;
+  $("er").textContent=r===null?"–":r.toFixed(1)+"%";$("er").className="big "+(r!==null&&r>=t?"ok":"no");
+  $("ebar").style.width=Math.min(100,r===null?0:r/t*100)+"%";
+  const need=t/100*e.bolsonaro-e.lula;$("eneed").textContent=r===null?"Sem base de comparação ainda.":(need>0?"Faltam "+fmt(need)+" para a meta de "+t+"%":"Meta de "+t+"% atingida");
+  $("pnote").textContent="Painel: curtidas + comentários novos nos posts recentes de perfis fixos (mesmo nº nos dois lados). O painel tem mais seguidores de um lado, então compare também por seguidor.";
+ })();
+ // curva do dia: razão Lula/Bolsonaro a cada snapshot
+ const lab=todays.map(s=>hhmm(s.ts)),rp=todays.map(s=>{const b=d(s,base,"bolsonaro","posts");return b>0?d(s,base,"lula","posts")/b*100:null}),
+  rv=todays.map(s=>{const b=d(s,base,"bolsonaro","views");return b>0?d(s,base,"lula","views")/b*100:null});
+ drawChart("c1",{type:"line",data:{labels:lab,datasets:[{label:"Posts: Lula % do Bolsonaro",data:rp,borderColor:cl,tension:.25},{label:"Views: Lula % do Bolsonaro",data:rv,borderColor:cb,tension:.25},{label:"Meta",data:lab.map(()=>t),borderColor:"#888",borderDash:[6,4],pointRadius:0}]},options:{plugins:{title:{display:true,text:"Hoje, a cada coleta"}}}});
+ // histórico por dia
+ const days=[...new Set(S.map(s=>s.day))].sort().reverse(),rows=days.map(day=>{
+  const e=S.filter(s=>s.day===day).pop(),b=baseline(S,day);
+  const pl=d(e,b,"lula","posts"),pb=d(e,b,"bolsonaro","posts"),vl=d(e,b,"lula","views"),vb=d(e,b,"bolsonaro","views");
+  const rp=pb>0?pl/pb*100:null,rv=vb>0?vl/vb*100:null;
+  const st=x=>x===null?"–":'<span class="'+(x>=t?"ok":"no")+'">'+x.toFixed(1)+"%</span>";
+  return "<tr><td>"+day.split("-").reverse().join("/")+(S.every(s=>s.day>=day)?" (parcial)":"")+"</td><td>"+fmt(pl)+" / "+fmt(pb)+"</td><td>"+st(rp)+"</td><td>"+fmt(vl)+" / "+fmt(vb)+"</td><td>"+st(rv)+"</td></tr>"});
+ $("hist").innerHTML="<tr><th>Dia</th><th>Posts L / B</th><th>Posts %</th><th>Views L / B</th><th>Views %</th></tr>"+rows.join("");
+ // aba volume: novos posts e views por snapshot (hoje) e por dia
+ const dl=days.slice().reverse(),dp=dl.map(day=>{const e=S.filter(s=>s.day===day).pop(),b=baseline(S,day);return[d(e,b,"lula","posts"),d(e,b,"bolsonaro","posts"),d(e,b,"lula","views"),d(e,b,"bolsonaro","views")]});
+ drawChart("c2",{type:"bar",data:{labels:dl,datasets:[{label:"Lula",data:dp.map(x=>x[0]),backgroundColor:cl},{label:"Bolsonaro",data:dp.map(x=>x[1]),backgroundColor:cb}]},options:{plugins:{title:{display:true,text:"Novos posts por dia"}}}});
+ drawChart("c3",{type:"bar",data:{labels:dl,datasets:[{label:"Lula",data:dp.map(x=>x[2]),backgroundColor:cl},{label:"Bolsonaro",data:dp.map(x=>x[3]),backgroundColor:cb}]},options:{plugins:{title:{display:true,text:"Novas views por dia"}}}});
+}
+
+// aba por região (anúncios políticos da Meta, por estado)
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===b));$("meta").classList.toggle("hide",b.dataset.t!=="meta");$("vol").classList.toggle("hide",b.dataset.t!=="vol");render()});
+["plat","tgt"].forEach(i=>$(i).addEventListener("input",render));
+render();setTimeout(()=>location.reload(),30*60*1000);
+</script></body></html>
