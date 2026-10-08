@@ -1,182 +1,270 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Volume de conversa: Lula x Bolsonaro</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="counts.js"></script>
-<script src="panel.js" onerror="window.PANEL=[]"></script>
+<title>Placar da reta final</title>
 <style>
-:root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--card:#f5f5f4;--l:#d6336c;--b:#1c7ed6;--bd:#e3e3e0;--ok:#2b8a3e;--no:#c92a2a}
-@media(prefers-color-scheme:dark){:root{--bg:#161616;--fg:#eee;--mut:#9a9a9a;--card:#222;--l:#f06595;--b:#4dabf7;--bd:#333;--ok:#69db7c;--no:#ff8787}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,sans-serif;padding:20px;max-width:960px;margin:auto}
-h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mut);margin-bottom:14px;font-size:14px}
-.tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--bd)}
-.tab{background:none;border:0;color:var(--mut);font:inherit;padding:8px 14px;cursor:pointer;border-bottom:2px solid transparent}
-.tab.on{color:var(--fg);border-bottom-color:var(--l);font-weight:600}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:14px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px}.row .card{margin:0}
-.big{font-size:28px;font-weight:600}.lab{color:var(--mut);font-size:13px}
-select,input{font:inherit;padding:6px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--fg)}
-.ctl{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden;margin-top:8px}.bar>i{display:block;height:100%;background:var(--l)}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--bd)}th:first-child,td:first-child{text-align:left}
-.ok{color:var(--ok);font-weight:600}.no{color:var(--no);font-weight:600}.warn{color:var(--mut);font-size:13px;margin-top:8px}
-canvas{max-height:280px}.hide{display:none}
-</style></head><body>
-<h1>Volume de conversa: Lula x Bolsonaro</h1>
-<div class="sub" id="upd">Carregando…</div>
-<div class="tabs"><button class="tab on" data-t="meta">Meta diária</button><button class="tab" data-t="vol">Volume por dia</button></div>
-<div class="ctl">
- <label>Rede <select id="plat"><option value="all">Todas</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select></label>
- <label>Meta: Lula = <input id="tgt" type="number" min="1" max="500" value="60" style="width:70px"> % do volume do Bolsonaro</label>
+:root,[data-theme="red"]{
+ --bg:#FFF4F4;--card:#FFFFFF;--cardbd:#F2C4CA;--tx:#2A0A10;--mut:#7C535B;--nos:#D7102E;--eles:#3D4A66;--track:#F3E1E3;--mark:#2A0A10;
+ --ok-hero-bg:#FFFFFF;--ok-hero-tx:#B00020;--ok-hero-bd:#D7102E;--ok-hero-sh:rgba(215,16,46,.28);--ok-icon:#D7102E;
+ --go-hero-bg:linear-gradient(160deg,#F0243F,#B3001B);--go-hero-tx:#FFFFFF;--go-hero-bd:#B3001B;--go-hero-sh:rgba(215,16,46,.45);--go-icon:#FFFFFF;
+ --acc-ok:#B00020;--acc-go:#D7102E;--bar-ok:linear-gradient(90deg,#B00020,#F0405A);--bar-go:linear-gradient(90deg,#D7102E,#FF6B80);
+ --pill-ok-bg:#FFFFFF;--pill-ok-tx:#B00020;--pill-ok-bd:#D7102E;--pill-go-bg:#D7102E;--pill-go-tx:#FFFFFF;--pill-go-bd:#D7102E;
+ --chip-bg:#D7102E;--chip-tx:#FFFFFF;--act-bg:#FFF4F4;--act-bd:#F2C4CA;--act-tx:#5A2F37;
+ --verb-bg:#FFE9EC;--verb-tx:#2A0A10;--verb-ic:#D7102E;--no-bg:#2A0A10;--no-bd:#2A0A10;--no-tx:#FFE9EC;--no-ic:#FF8A9B;
+ --chipbtn-bg:#FFFFFF;--chipbtn-bd:#F2C4CA;--sel-bg:#D7102E;--sel-tx:#FFFFFF}
+[data-theme="br"]{
+ --bg:#00205B;--card:#0A2D78;--cardbd:#1F4CA8;--tx:#FFFFFF;--mut:#A9C0F0;--nos:#FFDF00;--eles:#8FC0FF;--track:#001A47;--mark:#FFFFFF;
+ --ok-hero-bg:linear-gradient(160deg,#00B04A,#007A33);--ok-hero-tx:#FFFFFF;--ok-hero-bd:#00B04A;--ok-hero-sh:rgba(0,176,74,.45);--ok-icon:#FFDF00;
+ --go-hero-bg:linear-gradient(160deg,#FFE45C,#FFC800);--go-hero-tx:#00205B;--go-hero-bd:#FFC800;--go-hero-sh:rgba(255,200,0,.45);--go-icon:#00205B;
+ --acc-ok:#35E07A;--acc-go:#FFDF00;--bar-ok:linear-gradient(90deg,#00A846,#35E07A);--bar-go:linear-gradient(90deg,#FFC800,#FFEB70);
+ --pill-ok-bg:#009C3B;--pill-ok-tx:#FFFFFF;--pill-ok-bd:#009C3B;--pill-go-bg:#FFDF00;--pill-go-tx:#00205B;--pill-go-bd:#FFDF00;
+ --chip-bg:#009C3B;--chip-tx:#FFFFFF;--act-bg:#061E5A;--act-bd:#1F4CA8;--act-tx:#D6E3FF;
+ --verb-bg:#12409A;--verb-tx:#FFFFFF;--verb-ic:#FFDF00;--no-bg:#001A47;--no-bd:#FFDF00;--no-tx:#FFF3A8;--no-ic:#FFDF00;
+ --chipbtn-bg:#0A2D78;--chipbtn-bd:#1F4CA8;--sel-bg:#FFDF00;--sel-tx:#00205B}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.35 -apple-system,'Helvetica Neue',Arial,sans-serif;max-width:430px;margin:auto;padding:16px 16px 26px;transition:background .3s}
+.dev{font-size:12px;background:#222;color:#fff;border-radius:10px;padding:8px 10px;margin-bottom:12px;display:none}.dev button{margin-left:6px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.brand{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:800}
+.days{background:var(--chipbtn-bg);border:1px solid var(--chipbtn-bd);border-radius:99px;padding:5px 12px;font-size:12.5px;font-weight:800}
+.style{display:flex;gap:6px;margin-bottom:14px;background:var(--chipbtn-bg);border:1px solid var(--chipbtn-bd);border-radius:99px;padding:4px}
+.style button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-size:13px;font-weight:800;border-radius:99px;padding:7px 8px;cursor:pointer;display:flex;gap:7px;align-items:center;justify-content:center}
+.style button[aria-pressed="true"]{background:var(--sel-bg);color:var(--sel-tx)}
+.sw{display:inline-block;width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor}
+.sw.r{background:linear-gradient(90deg,#D7102E 50%,#fff 50%)}
+.sw.b{background:conic-gradient(#009C3B 0 33%,#FFDF00 0 66%,#002776 0)}
+.hero{border-radius:22px;padding:22px 18px 20px;text-align:center;margin-bottom:14px;border:2px solid}
+.hero svg{width:62px;height:62px;margin-bottom:6px}
+.hero h1{font-size:34px;line-height:1.05;font-weight:900;letter-spacing:-.02em}
+.hero p{margin-top:10px;font-size:15.5px;font-weight:600;opacity:.92}
+.hero.s-ok{background:var(--ok-hero-bg);color:var(--ok-hero-tx);border-color:var(--ok-hero-bd);box-shadow:0 10px 36px -10px var(--ok-hero-sh)}
+.hero.s-ok svg{stroke:var(--ok-icon)}
+.hero.s-go{background:var(--go-hero-bg);color:var(--go-hero-tx);border-color:var(--go-hero-bd);box-shadow:0 10px 36px -10px var(--go-hero-sh)}
+.hero.s-go svg{stroke:var(--go-icon)}
+.card{background:var(--card);border:1px solid var(--cardbd);border-radius:20px;padding:16px;margin-bottom:12px}
+.card.s-ok{--acc:var(--acc-ok);--bar:var(--bar-ok)}.card.s-go{--acc:var(--acc-go);--bar:var(--bar-go)}
+.k{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--mut)}
+.tag{border-radius:99px;padding:3px 10px;font-size:11.5px;letter-spacing:.06em;font-weight:900;border:1.5px solid}
+.s-ok .tag{background:var(--pill-ok-bg);color:var(--pill-ok-tx);border-color:var(--pill-ok-bd)}
+.s-go .tag{background:var(--pill-go-bg);color:var(--pill-go-tx);border-color:var(--pill-go-bd)}
+.sub{font-size:12.5px;color:var(--mut);margin:3px 0 10px}
+.pct{font-size:64px;font-weight:900;line-height:1;letter-spacing:-.03em}
+.pct small{font-size:15px;font-weight:600;color:var(--mut);letter-spacing:0;margin-left:8px}
+.vs{display:flex;justify-content:space-between;margin:14px 0 8px}
+.vs span{display:block;font-size:12px;color:var(--mut);font-weight:700}
+.vs b{font-size:26px;font-weight:900}
+.n b{color:var(--nos)}.e b{color:var(--eles)}.e{text-align:right}
+.bar{position:relative;height:18px;border-radius:99px;background:var(--track)}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--bar)}
+.mark{position:absolute;right:0;top:-5px;bottom:-5px;width:3px;background:var(--mark);border-radius:2px}
+.ml{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:6px;font-weight:700}
+.falta{margin-top:12px;font-size:15px;font-weight:800;color:var(--acc)}
+.act{margin-top:12px;border-radius:14px;padding:13px 14px;background:var(--act-bg);border:1px solid var(--act-bd)}
+.act h3{font-size:18px;font-weight:900;margin-bottom:6px;display:flex;gap:8px;align-items:center;color:var(--acc)}
+.act p{font-size:14.5px;color:var(--act-tx)}
+.act svg{width:22px;height:22px;fill:currentColor;stroke:currentColor;flex:none}
+.verbs{display:flex;gap:8px;margin:10px 0 2px}
+.verbs div{flex:1;background:var(--verb-bg);color:var(--verb-tx);border-radius:12px;padding:9px 4px;text-align:center;font-size:13px;font-weight:800}
+.verbs svg{display:block;margin:0 auto 4px;width:22px;height:22px;fill:var(--verb-ic);stroke:var(--verb-ic)}
+.no{margin-top:8px;display:flex;gap:9px;align-items:flex-start;background:var(--no-bg);border:1px solid var(--no-bd);border-radius:12px;padding:10px 12px;font-size:14px;color:var(--no-tx);font-weight:700}
+.no svg{flex:none;width:22px;height:22px;stroke:var(--no-ic);fill:none;margin-top:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips span{background:var(--chip-bg);color:var(--chip-tx);font-weight:800;border-radius:99px;padding:5px 12px;font-size:14px}
+.foot{margin-top:6px;font-size:11.5px;color:var(--mut);text-align:center}
+
+.trend{font-size:13px;font-weight:700;color:var(--mut);margin-top:6px}
+.trend b{color:var(--tx)}
+.sim{font-size:12.5px;background:var(--chipbtn-bg);border:1px dashed var(--chipbtn-bd);border-radius:14px;padding:10px 12px;margin-bottom:14px;color:var(--tx)}
+.sim summary{cursor:pointer;font-weight:800}
+.sim .g{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:10px}
+.sim label{display:flex;flex-direction:column;gap:3px;font-weight:700;color:var(--mut);font-size:12px}
+.sim input[type=number]{font:inherit;padding:5px 6px;border:1px solid var(--chipbtn-bd);border-radius:8px;background:var(--bg);color:var(--tx);width:100%}
+.sim .pre{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.sim .pre button{font:inherit;font-size:12px;font-weight:800;border:1px solid var(--chipbtn-bd);background:var(--card);color:var(--tx);border-radius:99px;padding:5px 10px;cursor:pointer}
+.sim .cb{flex-direction:row;align-items:center;gap:6px;grid-column:1/3}
+
+/* ---- v3: contador grande e rosca de share ---- */
+.count{border-radius:22px;padding:16px 16px 14px;margin-bottom:14px;text-align:center;background:var(--cnt-bg);color:var(--cnt-tx);border:1px solid var(--cnt-bd);overflow:hidden}
+.count .tl{font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:900;color:var(--cnt-acc)}
+.count .nm{display:flex;align-items:baseline;justify-content:center;gap:10px;line-height:.95;margin:4px 0 2px}
+.count .nm b{font-size:104px;font-weight:900;letter-spacing:-.05em;color:var(--cnt-num)}
+.count .nm span{font-size:26px;font-weight:800;opacity:.85}
+.count .nm.dd b{font-size:62px;letter-spacing:-.02em}
+.count .lb{font-size:14.5px;font-weight:700;opacity:.92}
+.dots{display:flex;gap:4px;justify-content:center;margin-top:12px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--dot-off)}
+.dots i.on{background:var(--dot-on)}
+.dots i.now{background:var(--cnt-num);box-shadow:0 0 0 3px var(--dot-ring);animation:pulse 2s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.dots i.now{animation:none}}
+.donut{display:flex;align-items:center;gap:14px;margin:6px 0 4px}
+.donut svg{flex:none;width:136px;height:136px}
+.donut .ctr{font-weight:900;fill:var(--tx)}
+.donut .ctrs{font-weight:700;fill:var(--mut)}
+.leg{flex:1;min-width:0;text-align:left}.leg .row{text-align:left!important}
+.leg .row{margin-bottom:10px}.leg .row span{display:block;font-size:12px;color:var(--mut);font-weight:700}
+.leg .row b{font-size:25px;font-weight:900;line-height:1.1}.leg .row small{font-size:13px;color:var(--mut);font-weight:700;margin-left:6px}
+.leg .n b{color:var(--nos)}.leg .e b{color:var(--eles)}
+.leg .meta{font-size:12.5px;color:var(--mut);font-weight:800;display:flex;align-items:center;gap:6px}
+.leg .meta i{display:inline-block;width:3px;height:14px;background:var(--mark);border-radius:2px}
+[data-theme="red"]{--cnt-bg:linear-gradient(165deg,#3A0A14,#1E0509);--cnt-tx:#FFE9EC;--cnt-bd:#5A1424;--cnt-acc:#FF8A9B;--cnt-num:#FFFFFF;--dot-off:#5A2F37;--dot-on:#FF4D6D;--dot-ring:rgba(255,255,255,.35)}
+[data-theme="br"]{--cnt-bg:linear-gradient(165deg,#0A2D78,#001447);--cnt-tx:#E6EEFF;--cnt-bd:#1F4CA8;--cnt-acc:#35E07A;--cnt-num:#FFDF00;--dot-off:#1B3F94;--dot-on:#009C3B;--dot-ring:rgba(255,223,0,.4)}
+.sim input[type=number]{width:100%}
+
+.first{min-height:84vh;display:flex;flex-direction:column;justify-content:center;gap:0}
+.first .count{margin-bottom:12px}
+.hoje{border-radius:22px;padding:16px 16px 14px;text-align:center;background:var(--hj-bg);color:var(--hj-tx);border:2px solid var(--hj-bd)}
+.hoje .t{font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:900;opacity:.85}
+.hoje .big{font-size:clamp(34px,11vw,48px);font-weight:900;line-height:1;margin:6px 0 8px;letter-spacing:-.02em}
+.hoje .big em{font-style:normal;font-size:.5em;opacity:.8;margin:0 4px}
+.hoje p{margin:0;font-size:15px;font-weight:700;line-height:1.35}
+.hoje .ac{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.hoje .ac span{display:inline-flex;align-items:center;gap:6px;background:var(--hj-chip);color:var(--hj-chiptx);border-radius:99px;padding:7px 12px;font-weight:800;font-size:13.5px}
+.hoje .ac svg{width:16px;height:16px;fill:currentColor;stroke:currentColor;stroke-linejoin:round}
+.more{display:block;width:100%;margin-top:14px;padding:12px;background:none;border:0;font:inherit;font-weight:800;font-size:14px;color:var(--mut);cursor:pointer;text-align:center}
+.more svg{width:22px;height:22px;display:block;margin:2px auto 0;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(5px)}}
+@media(prefers-reduced-motion:reduce){.more svg{animation:none}}
+[data-theme="red"]{--hj-bg:linear-gradient(180deg,#F0233F,#C8102E);--hj-tx:#fff;--hj-bd:#C8102E;--hj-chip:#fff;--hj-chiptx:#C8102E}
+[data-theme="br"]{--hj-bg:linear-gradient(180deg,#FFE94D,#FFD000);--hj-tx:#001447;--hj-bd:#FFD000;--hj-chip:#001447;--hj-chiptx:#FFDF00}
+.hoje.ok{background:var(--card,#fff);}
+[data-theme="red"] .hoje.ok{background:#fff;color:#C8102E}
+[data-theme="red"] .hoje.ok .ac span{background:#C8102E;color:#fff}
+[data-theme="br"] .hoje.ok{background:linear-gradient(180deg,#14B85A,#009C3B);color:#fff;border-color:#009C3B}
+[data-theme="br"] .hoje.ok .ac span{background:#fff;color:#006B28}
+.more.lk{text-decoration:none;margin-top:6px}</style><script src="counts.js" onerror="window.COUNTS=[]"></script>
+<script src="panel.js" onerror="window.PANEL=[]"></script>
+</head><body>
+<div class="top"><div class="brand">Placar da reta final</div></div>
+<div class="style" role="group" aria-label="Escolha o estilo">
+ <button id="b-red" aria-pressed="true" onclick="setT('red')"><span class="sw r"></span>Vermelho e branco</button>
+ <button id="b-br" aria-pressed="false" onclick="setT('br')"><span class="sw b"></span>Cores do Brasil</button>
 </div>
-
-<section id="meta">
- <div class="row">
-  <div class="card"><div class="lab">Posts novos hoje: Lula</div><div class="big" id="pl" style="color:var(--l)">–</div></div>
-  <div class="card"><div class="lab">Posts novos hoje: Bolsonaro</div><div class="big" id="pb" style="color:var(--b)">–</div></div>
-  <div class="card"><div class="lab">Lula como % do Bolsonaro (posts)</div><div class="big" id="pr">–</div><div class="bar"><i id="pbar"></i></div><div class="lab" id="pneed"></div></div>
- </div>
- <div class="row">
-  <div class="card"><div class="lab">Engajamento (views) hoje: Lula</div><div class="big" id="vl" style="color:var(--l)">–</div></div>
-  <div class="card"><div class="lab">Engajamento (views) hoje: Bolsonaro</div><div class="big" id="vb" style="color:var(--b)">–</div></div>
-  <div class="card"><div class="lab">Lula como % do Bolsonaro (views)</div><div class="big" id="vr">–</div><div class="bar"><i id="vbar"></i></div><div class="lab" id="vneed"></div></div>
- </div>
-
- <div class="row">
-  <div class="card"><div class="lab">Engajamento do painel hoje: Lula</div><div class="big" id="el" style="color:var(--l)">–</div><div class="lab" id="fl"></div></div>
-  <div class="card"><div class="lab">Engajamento do painel hoje: Bolsonaro</div><div class="big" id="eb" style="color:var(--b)">–</div><div class="lab" id="fb"></div></div>
-  <div class="card"><div class="lab">Lula como % do Bolsonaro (painel)</div><div class="big" id="er">–</div><div class="bar"><i id="ebar"></i></div><div class="lab" id="eneed"></div></div>
- </div>
- <div class="warn" id="pnote" style="margin:-4px 0 12px"></div>
- <div class="card"><div class="lab" style="margin-bottom:6px">Painel por perfil (Instagram)</div><table id="byprof"></table>
-  <div class="lab" style="margin-top:6px">Eng. novo hoje = curtidas + comentários novos hoje. Média/post = dos últimos 12 posts. Eng/1k seg. = média por post a cada 1.000 seguidores (compara perfis de tamanhos diferentes).</div></div>
- <div class="card" id="onecol" style="display:none"></div>
- <div class="card"><div class="lab" style="margin-bottom:6px">Contadores atuais das hashtags (total acumulado, última coleta)</div><table id="tot"></table></div>
- <div class="card"><canvas id="c1"></canvas></div>
- <div class="card"><div class="lab" style="margin-bottom:6px">Acompanhamento do dia (acumulado a cada coleta, horário de Brasília)</div><table id="intra"></table><div class="lab" id="pace" style="margin-top:8px"></div></div>
- <div class="card"><canvas id="c5"></canvas></div>
-
- <div class="card"><div class="lab" style="margin-bottom:6px">Histórico de metas por dia</div><table id="hist"></table></div>
-</section>
-
-<section id="vol" class="hide">
- <div class="card"><canvas id="c2"></canvas></div>
- <div class="card"><canvas id="c3"></canvas></div>
-</section>
-
-<div class="warn">Volume = novos posts/views nas hashtags monitoradas (3 por lado, mesmo critério), calculado pela diferença entre contadores de hashtag. Não é o total das redes, e volume não mede favorabilidade. Engajamento = views (só TikTok fornece). Dia = horário de Brasília. Atualiza a cada 2h.</div>
-
+<div id="app"></div>
 <script>
-const TZ="America/Sao_Paulo",$=id=>document.getElementById(id),D=window.COUNTS||[];
+const I={
+ heart:'<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9.1C1 8.6 3 5 6.4 5c2 0 3.4 1.1 5.6 3.2C14.2 6.1 15.6 5 17.6 5 21 5 23 8.6 21.3 11.9 19 16.4 12 21 12 21z"/></svg>',
+ chat:'<svg viewBox="0 0 24 24"><path d="M4 4h16v12H9l-5 4V4z"/></svg>',
+ share:'<svg viewBox="0 0 24 24"><path d="M3 11l18-8-7 18-3-8-8-2z"/></svg>',
+ post:'<svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke-width="3.2" fill="none"/></svg>',
+ stop:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke-width="2.6"/><path d="M6 6l12 12" stroke-width="2.6"/></svg>',
+ check:'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke-width="5"/><path d="M19 33l9 9 17-19" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ chev:'<svg viewBox="0 0 64 64"><g fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path opacity=".35" d="M12 28l20-14 20 14"/><path opacity=".65" d="M12 42l20-14 20 14"/><path d="M12 56l20-14 20 14"/></g></svg>'};
+const TOTAL=20,ELEICAO='2026-10-25'; // dia 5/10 = dia 1 (dia seguinte ao 1º turno); 24/10 = dia 20; 25/10 = dia D
+const fmtC=n=>n>=1e6?(n/1e6).toFixed(1).replace(".",",")+" mi":n>=1e4?Math.round(n/1e3)+" mil":Math.round(n).toLocaleString("pt-BR");
+const pick=(a,seed,off)=>a[(seed+off)%a.length];
+let TAGS='';
+const P={
+ heroOk:["Tamo bem, pessoal! Segura a onda.","Meta batida. Agora é manter.","Quem está na frente não para. Tamo junto!","Bom placar, pessoal! Mantém o ritmo."],
+ subOk:["Nos números que a gente acompanha, estamos na frente. Segura até o fim do dia.","Placar bom, mas a eleição ainda não chegou. Segue firme.","Nos números que a gente acompanha, estamos acima da meta. Não é hora de relaxar."],
+ heroFar:["Dia de ir com tudo, pessoal!","Hoje o jogo é recuperar. Bora, bora, bora!","Bora, pessoal! Hoje a gente vira esse jogo."],
+ heroNear:["Falta pouco! Mais um empurrão.","Quase lá, pessoal. A meta está logo ali.","Falta pouco. Cada post conta."],
+ heroMix:["Um placar na meta, o outro pede reforço.","Metade do caminho! Falta fechar o outro placar.","Estamos bem em um. Bora fechar o outro!"],
+ subFlat:["Cada post e cada curtida contam.","Quem posta, curte e comenta muda o placar.","A virada se faz com muita gente fazendo um pouco."],
+ vPost:["Poste um vídeo ou um story nas próximas 2 horas. Cada post puxa a conversa pro nosso lado. Use as hashtags:","Um vídeo, um story ou um repost já ajuda. Poste agora e use as hashtags:","Quem já postou hoje, posta de novo. Quem ainda não, é a hora. Use as hashtags:"],
+ vOk:["Continua postando e repostando.","Boa! O que a gente posta está funcionando. Não para.","Segue o ritmo: um post a mais hoje faz diferença amanhã."],
+ eIntro:["Cada gesto seu conta:","Curta, comente e compartilhe o nosso lado:","Reforça os nossos posts agora:"],
+ eOk:["Segue curtindo, comentando e compartilhando o nosso lado.","Engajamento forte! Quem curtiu hoje, comenta amanhã também.","Boa, pessoal! Continua reforçando os posts do nosso lado."]};
+
+function contador(D){
+ const n=Math.min(TOTAL,Math.max(1,TOTAL-D+1));
+ let tl="A grande virada",num=String(n),of="de "+TOTAL,lb="Faltam "+D+" dias pro 2º turno (25/10)",dd=false;
+ if(D<=14&&D>7)tl="Reta final";
+ if(D<=7&&D>1)tl="Semana decisiva";
+ if(D<0){tl="2º turno";num="Obrigado!";of="";lb="A virada foi feita por vocês.";dd=true}
+ if(D===1){tl="Amanhã é o dia";num=String(TOTAL);lb="Último dia pra virar. Faltam 1 dia pro 2º turno."}
+ if(D===0){tl="2º turno";num="É HOJE!";of="";lb="Dia de votar. Vamos com tudo!";dd=true}
+ let dots="";for(let i=1;i<=TOTAL;i++)dots+=`<i class="${D===0||i<n?'on':''}${D>0&&i===n?' now':''}"></i>`;
+ return `<div class="count"><div class="tl">${tl}</div><div class="nm${dd?' dd':''}">${D>0?'<span>Dia</span>':''}<b>${num}</b>${of?`<span>${of}</span>`:''}</div><div class="lb">${lb}</div><div class="dots">${dots}</div></div>`}
+
+function copy(s){
+ const seed=s.seed,D=s.D,T=s.T;
+ const m=[{k:"v",r:s.rV,p:s.pV},{k:"e",r:s.rE,p:s.pE}];
+ const disp=v=>v>=T?Math.round(v):Math.floor(v);
+ m.forEach(x=>{x.ok=x.r>=T;x.dl=(x.p==null)?null:disp(x.r)-disp(x.p)});
+ const bad=m.filter(x=>!x.ok),allOk=bad.length===0,mixed=bad.length===1;
+ const dls=m.filter(x=>x.dl!==null).map(x=>x.dl),avg=dls.length?dls.reduce((a,b)=>a+b,0)/dls.length:null;
+ const near=bad.length&&bad.every(x=>(T-x.r)/T<=0.2);
+ let head,sub;
+ if(allOk){head=pick(P.heroOk,seed,0);sub=pick(P.subOk,seed,1)}
+ else{
+  head=mixed?pick(P.heroMix,seed,0):near?pick(P.heroNear,seed,0):pick(P.heroFar,seed,0);
+  sub=avg!==null&&avg>=2?"Subimos desde ontem. Mais um empurrão.":avg!==null&&avg<=-2?"Ontem foi mais forte. Vamos recuperar.":pick(P.subFlat,seed,1);
+  sub+=s.hora<12?" Bom dia! Começa o dia postando.":s.hora<18?" Ainda dá tempo de virar o dia.":" Últimas horas do dia: ainda dá tempo de bater a meta."}
+ if(D===1)head=allOk?"Amanhã é o dia! Chega firme, pessoal.":"Amanhã é o dia! Última chamada, pessoal.";
+ if(D===0)head="Hoje é dia de votar! Vamos com tudo.";
+ return{ok:allOk,head,sub,m,disp}}
+
+function rosca(share,T){
+ const R=48,C=2*Math.PI*R,s=Math.max(0,Math.min(100,share))/100;
+ const th=(T/100)*2*Math.PI-Math.PI/2,x1=60+(R-12)*Math.cos(th),y1=60+(R-12)*Math.sin(th),x2=60+(R+12)*Math.cos(th),y2=60+(R+12)*Math.sin(th);
+ return `<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--eles)" stroke-width="16"/>
+ <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--nos)" stroke-width="16" stroke-dasharray="${(s*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)"/>
+ <line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--mark)" stroke-width="4" stroke-linecap="round"/>
+ <text class="ctr" x="60" y="62" text-anchor="middle" font-size="30">${Math.round(share>=T?share:Math.floor(share))}%</text><text class="ctrs" x="60" y="80" text-anchor="middle" font-size="11">do total</text></svg>`}
+
+function card(c,titulo,sub,x,T,nos,eles,falta,acao){
+ const ok=c==='ok',disp=v=>v>=T?Math.round(v):Math.floor(v);
+ const tr=x.p==null?"":`<div class="trend">Ontem <b>${disp(x.p)}%</b> → hoje <b>${disp(x.r)}%</b> (${x.dl>0?"▲ +"+x.dl:x.dl<0?"▼ −"+Math.abs(x.dl):"= igual"})</div>`;
+ return `<div class="card s-${c}"><div class="k"><span>${titulo}</span><span class="tag">${ok?'TAMO BEM':'BORA LÁ'}</span></div><div class="sub">${sub}</div>
+ <div class="donut">${rosca(x.r,T)}<div class="leg">
+  <div class="row n"><span>Nós</span><b>${fmtC(nos)}</b><small>${disp(x.r)}%</small></div>
+  <div class="row e"><span>Eles</span><b>${fmtC(eles)}</b><small>${100-disp(x.r)}%</small></div>
+  <div class="meta"><i></i>meta: ${T}% do total</div></div></div>${tr}
+ <div class="falta">${falta}</div>${acao}</div>`}
+
+function draw(){
+ const s=dados();
+ if(!s){document.getElementById('app').innerHTML='<section class="first">'+contador(diasEntre(hojeS(),ELEICAO))+'<div class="hoje"><div class="t">Meta de hoje</div><div class="big" style="font-size:26px">Aguardando as primeiras coletas</div><p>Os números de hoje aparecem a partir da 2ª coleta do dia.</p></div></section>';return}
+ const c=copy(s),seed=s.seed,T=s.T;
+ const [mv,me]=c.m;
+ const nosV=s.V.l,eleV=s.V.b,nosE=s.E.l,eleE=s.E.b,TV=nosV+eleV,TE=nosE+eleE;
+ const need=(sh,Tot)=>{const t=T/100;return Math.max(0,t/(1-t)*(Tot*(1-sh/100))-Tot*sh/100)}; // quanto falta se eles ficarem onde estão
+ const fV=mv.ok?`Meta batida. Sobraram ${fmtC(nosV-T/(100-T)*eleV)} de folga.`:((T-s.rV)/T<=.2?`Falta pouco: só mais ${fmtC(need(s.rV,TV))} de views pra chegar a ${T}%.`:`Pra chegar a ${T}% do total, faltam ${fmtC(need(s.rV,TV))} de views.`);
+ const fE=me.ok?`Meta batida. Sobraram ${fmtC(nosE-T/(100-T)*eleE)} de folga.`:((T-s.rE)/T<=.2?`Falta pouco: só mais ${fmtC(need(s.rE,TE))} de engajamento pra chegar a ${T}%.`:`Pra chegar a ${T}% do total, faltam ${fmtC(need(s.rE,TE))} de engajamento.`);
+ const aV=mv.ok?`<div class="act"><h3>${I.post}Nossas hashtags estão rendendo</h3><p>${pick(P.vOk,seed,2)}</p>${TAGS}</div>`
+  :`<div class="act"><h3>${I.post}1. Poste mais, hoje</h3><p>${s.theyPost?"Eles estão postando mais. ":"Eles estão ganhando mais views. "}${pick(P.vPost,seed,2)}</p>${TAGS}</div>`;
+ const aE=me.ok?`<div class="act"><h3>${I.heart}A galera está engajando</h3><p>${pick(P.eOk,seed,2)}</p></div>`
+  :`<div class="act"><h3>${I.heart}2. Não deixa de engajar</h3><p>Eles estão engajando mais. ${pick(P.eIntro,seed,0)}</p><div class="verbs"><div>${I.heart}Curta</div><div>${I.chat}Comente</div><div>${I.share}Compartilhe</div></div><div class="no">${I.stop}<span>Gaste esse tempo no nosso lado. Evite curtir ou comentar o conteúdo deles, até pra criticar: isso dá mais alcance pra eles.</span></div></div>`;
+ const bV=!mv.ok,bE=!me.ok;
+ let hb,hp,hc;
+ if(bV&&bE){hb='Views <em>+</em> Engajamento';hp='Os dois placares estão abaixo de '+T+'%. Hoje o foco é nos dois.';hc=`<span>${I.post}Poste mais</span><span>${I.heart}Curta, comente, compartilhe</span>`}
+ else if(bV){hb='Views';hp='O engajamento já está na meta. Falta empurrar as views: postar e usar as hashtags.';hc=`<span>${I.post}Poste mais, com as hashtags</span>`}
+ else if(bE){hb='Engajamento';hp='As views já estão na meta. Falta engajar: curtir, comentar e compartilhar o nosso lado.';hc=`<span>${I.heart}Curta, comente, compartilhe</span>`}
+ else{hb='Manter o ritmo';hp='Os dois placares estão acima de '+T+'%. Não para agora!';hc=`<span>${I.check.replace('<svg','<svg style="stroke:currentColor"')}Meta de hoje batida</span>`}
+ const hoje=`<div class="hoje${c.ok?' ok':''}"><div class="t">Meta de hoje</div><div class="big">${hb}</div><p>${hp}</p><div class="ac">${hc}</div></div>`;
+ let h='<section class="first">'+contador(s.D)+hoje+`<button class="more" onclick="document.getElementById('placar').scrollIntoView({behavior:'smooth'})">Ver o placar completo<svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></svg></button></section><div id="placar"></div>`+`<div class="hero s-${c.ok?'ok':'go'}">${c.ok?I.check:I.chev}<h1>${c.head}</h1><p>${c.sub}</p></div>`;
+ h+=card(mv.ok?'ok':'go','Views','Views novas hoje nas hashtags (TikTok)',mv,T,nosV,eleV,fV,aV);
+ h+=card(me.ok?'ok':'go','Engajamento','Curtidas + comentários novos hoje (perfis do painel)',me,T,nosE,eleE,fE,aE);
+ document.getElementById('app').innerHTML=h+'<div class="foot">Hoje, horário de Brasília · atualiza a cada 2h · compara o nosso lado com o deles nas mesmas hashtags e em perfis fixos; não é o total das redes</div><a class="more lk" href="detalhe.html">Ver detalhes: metas e volume por dia</a>'}
+
+
+const TZ="America/Sao_Paulo",D0=window.COUNTS||[],PN=window.PANEL||[];
 const dayOf=ts=>new Date(ts).toLocaleDateString("en-CA",{timeZone:TZ});
-const hhmm=ts=>new Date(ts).toLocaleTimeString("pt-BR",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});
-const fmt=n=>Math.round(n).toLocaleString("pt-BR");
-let ch={};
-function series(){
- const p=$("plat").value,rows=D.filter(r=>p==="all"||r.platform===p),snap={};
- rows.forEach(r=>{(snap[r.ts]=snap[r.ts]||{lula:{posts:0,views:0},bolsonaro:{posts:0,views:0}});snap[r.ts][r.side].posts+=r.posts;snap[r.ts][r.side].views+=r.views});
- return Object.keys(snap).sort().map(ts=>({ts,day:dayOf(ts),...snap[ts]}));
-}
-function baseline(S,day){ // último snapshot de um dia anterior; senão o primeiro do próprio dia
- const prev=S.filter(s=>s.day<day);return prev.length?prev[prev.length-1]:S.find(s=>s.day===day);
-}
-const d=(a,b,side,m)=>Math.max(0,a[side][m]-b[side][m]);
-function drawChart(id,cfg){if(typeof Chart==="undefined")return;ch[id]&&ch[id].destroy();ch[id]=new Chart($(id),cfg)}
-function render(){
- const S=series(),t=+$("tgt").value;
- if(!S.length){$("upd").textContent="Sem dados ainda. A primeira coleta roda em até 2 horas.";return}
- const last=S[S.length-1];$("upd").textContent="Última coleta: "+new Date(last.ts).toLocaleString("pt-BR",{timeZone:TZ})+" (Brasília)";
- const css=getComputedStyle(document.documentElement),cl=css.getPropertyValue("--l"),cb=css.getPropertyValue("--b");
- const today=last.day,base=baseline(S,today),todays=S.filter(s=>s.day===today);
- const L={posts:d(last,base,"lula","posts"),views:d(last,base,"lula","views")},B={posts:d(last,base,"bolsonaro","posts"),views:d(last,base,"bolsonaro","views")};
- const partial=!S.some(s=>s.day<today);
- function card(m,idl,idb,idr,idbar,idneed){
-  $(idl).textContent=fmt(L[m]);$(idb).textContent=fmt(B[m]);
-  const r=B[m]>0?L[m]/B[m]*100:null;
-  $(idr).textContent=r===null?"–":r.toFixed(1)+"%";$(idr).className="big "+(r!==null&&r>=t?"ok":"no");
-  $(idbar).style.width=Math.min(100,r===null?0:r/t*100)+"%";
-  const need=t/100*B[m]-L[m];
-  $(idneed).textContent=r===null?"Sem base de comparação ainda.":(need>0?"Faltam "+fmt(need)+" para a meta de "+t+"%":"Meta de "+t+"% atingida");
- }
- card("posts","pl","pb","pr","pbar","pneed");card("views","vl","vb","vr","vbar","vneed");
-
-
- // contadores acumulados da última coleta + aviso quando só há 1 coleta
- (function(){
-  const p=$("plat").value,L=D.filter(r=>r.ts===last.ts&&(p==="all"||r.platform===p));
-  $("tot").innerHTML="<tr><th>Hashtag</th><th>Rede</th><th>Lado</th><th>Posts</th><th>Views</th></tr>"+L.map(r=>"<tr><td>#"+r.tag+"</td><td>"+r.platform+"</td><td>"+r.side+"</td><td>"+fmt(r.posts)+"</td><td>"+(r.views?fmt(r.views):"–")+"</td></tr>").join("");
-  const one=S.length<2,el=$("onecol");el.style.display=one?"block":"none";
-  if(one)el.innerHTML="<b>Só 1 coleta registrada.</b> Os números de “hoje” são a diferença entre coletas, então aparecem a partir da 2ª coleta (daqui a algumas horas). Por enquanto, veja os totais acumulados abaixo.";
- })();
-
-
- // acompanhamento dentro do dia
- (function(){
-  const PN=(window.PANEL||[]).filter(r=>($("plat").value==="all"||r.platform===$("plat").value)&&dayOf(r.ts)===today);
-  const cum=(ts,side)=>PN.filter(r=>r.side===side&&new Date(r.ts)<=new Date(ts).getTime()+15*60000).reduce((a,r)=>a+r.new_eng,0);
-  const pc=(a,b)=>b>0?(a/b*100).toFixed(1)+"%":"–",
-   cell=(a,b)=>{const r=b>0?a/b*100:null;return"<td>"+fmt(a)+" / "+fmt(b)+"</td><td class='"+(r===null?"":(r>=t?"ok":"no"))+"'>"+pc(a,b)+"</td>"};
-  const rows=todays.map(s=>{const pl=d(s,base,"lula","posts"),pb=d(s,base,"bolsonaro","posts"),vl=d(s,base,"lula","views"),vb=d(s,base,"bolsonaro","views"),el=cum(s.ts,"lula"),eb=cum(s.ts,"bolsonaro");
-   return{h:hhmm(s.ts),pl,pb,vl,vb,el,eb,html:"<tr><td>"+hhmm(s.ts)+"</td>"+cell(pl,pb)+cell(vl,vb)+cell(el,eb)+"</tr>"}});
-  $("intra").innerHTML="<tr><th>Hora</th><th>Posts L / B</th><th>%</th><th>Views L / B</th><th>%</th><th>Eng. painel L / B</th><th>%</th></tr>"+rows.map(r=>r.html).join("");
-  // ritmo e projeção (linear, estimativa)
-  const parts=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date()),
-   h=Math.max(0.5,(+parts.find(x=>x.type==="hour").value%24)+(+parts.find(x=>x.type==="minute").value)/60),rem=24-h;
-  const rl=L.posts/h,rb=B.posts/h,pjL=rl*24,pjB=rb*24;
-  if(B.posts>0&&todays.length>1&&rem>0.25){
-   const need=Math.max(0,(t/100*pjB-L.posts)/rem);
-   $("pace").textContent="Ritmo até agora: Lula "+fmt(rl)+" posts/h, Bolsonaro "+fmt(rb)+" posts/h. Projeção do dia no ritmo atual: Lula "+fmt(pjL)+" × Bolsonaro "+fmt(pjB)+" ("+pc(pjL,pjB)+"). Para fechar em "+t+"%, o Lula precisaria de ~"+fmt(need)+" posts/h nas "+rem.toFixed(1)+"h que restam. Estimativa linear; o ritmo varia ao longo do dia.";
-  }else $("pace").textContent="Ritmo e projeção aparecem a partir da 2ª coleta do dia.";
-  const labs=rows.map(r=>r.h);
-  drawChart("c5",{type:"line",data:{labels:labs,datasets:[
-   {label:"Posts Lula (acum. hoje)",data:rows.map(r=>r.pl),borderColor:cl,tension:.25},{label:"Posts Bolsonaro (acum. hoje)",data:rows.map(r=>r.pb),borderColor:cb,tension:.25},
-   {label:"Eng. painel Lula",data:rows.map(r=>r.el),borderColor:cl,borderDash:[5,4],tension:.25,yAxisID:"y2"},{label:"Eng. painel Bolsonaro",data:rows.map(r=>r.eb),borderColor:cb,borderDash:[5,4],tension:.25,yAxisID:"y2"}]},
-   options:{scales:{y:{title:{display:true,text:"Posts"}},y2:{position:"right",grid:{drawOnChartArea:false},title:{display:true,text:"Engajamento"}}},plugins:{title:{display:true,text:"Evolução acumulada no dia"}}}});
- })();
- // breakdown por perfil
- (function(){
-  const P=(window.PANEL||[]).filter(r=>$("plat").value==="all"||r.platform===$("plat").value),T=$("byprof");
-  if(!P.length){T.innerHTML="<tr><td>Sem dados do painel ainda. Rode collect_panel.py.</td></tr>";return}
-  const by={};P.slice().sort((a,b)=>a.ts<b.ts?-1:1).forEach(r=>{const k=r.platform+"|"+r.profile,o=by[k]=by[k]||{profile:r.profile,side:r.side,newEng:0,newPosts:0};
-   o.followers=r.followers;o.avg=r.avg_eng||0;if(dayOf(r.ts)===today){o.newEng+=r.new_eng;o.newPosts+=r.new_posts}});
-  const rows=Object.values(by).sort((a,b)=>b.newEng-a.newEng||b.avg-a.avg);
-  T.innerHTML="<tr><th>Perfil</th><th>Lado</th><th>Seguidores</th><th>Eng. novo hoje</th><th>Posts novos</th><th>Média/post</th><th>Eng/1k seg.</th></tr>"+
-   rows.map(o=>"<tr><td>"+o.profile+"</td><td style='color:"+(o.side==="lula"?cl:cb)+"'>"+(o.side==="lula"?"Lula":"Bolsonaro")+"</td><td>"+fmt(o.followers)+"</td><td>"+fmt(o.newEng)+"</td><td>"+o.newPosts+"</td><td>"+fmt(o.avg)+"</td><td>"+(o.followers?(o.avg/o.followers*1000).toFixed(2):"–")+"</td></tr>").join("");
- })();
- // painel de perfis (curtidas+comentários novos hoje, soma dos snapshots do dia) + seguidores do último snapshot
- (function(){
-  const P=(window.PANEL||[]).filter(r=>$("plat").value==="all"||r.platform===$("plat").value),tod=P.filter(r=>dayOf(r.ts)===today);
-  const e={lula:0,bolsonaro:0};tod.forEach(r=>e[r.side]+=r.new_eng);
-  const lastTs=P.length?P.map(r=>r.ts).sort().pop():null,f={lula:0,bolsonaro:0},n={lula:0,bolsonaro:0};
-  P.filter(r=>r.ts===lastTs).forEach(r=>{f[r.side]+=r.followers;n[r.side]++});
-  if(!P.length){["el","eb","er"].forEach(i=>$(i).textContent="–");$("pnote").textContent="Painel de perfis ainda sem dados (a 1ª coleta só registra a base).";return}
-  $("el").textContent=fmt(e.lula);$("eb").textContent=fmt(e.bolsonaro);
-  $("fl").textContent=n.lula+" perfis · "+fmt(f.lula)+" seguidores";$("fb").textContent=n.bolsonaro+" perfis · "+fmt(f.bolsonaro)+" seguidores";
-  const r=e.bolsonaro>0?e.lula/e.bolsonaro*100:null;
-  $("er").textContent=r===null?"–":r.toFixed(1)+"%";$("er").className="big "+(r!==null&&r>=t?"ok":"no");
-  $("ebar").style.width=Math.min(100,r===null?0:r/t*100)+"%";
-  const need=t/100*e.bolsonaro-e.lula;$("eneed").textContent=r===null?"Sem base de comparação ainda.":(need>0?"Faltam "+fmt(need)+" para a meta de "+t+"%":"Meta de "+t+"% atingida");
-  $("pnote").textContent="Painel: curtidas + comentários novos nos posts recentes de perfis fixos (mesmo nº nos dois lados). O painel tem mais seguidores de um lado, então compare também por seguidor.";
- })();
- // curva do dia: razão Lula/Bolsonaro a cada snapshot
- const lab=todays.map(s=>hhmm(s.ts)),rp=todays.map(s=>{const b=d(s,base,"bolsonaro","posts");return b>0?d(s,base,"lula","posts")/b*100:null}),
-  rv=todays.map(s=>{const b=d(s,base,"bolsonaro","views");return b>0?d(s,base,"lula","views")/b*100:null});
- drawChart("c1",{type:"line",data:{labels:lab,datasets:[{label:"Posts: Lula % do Bolsonaro",data:rp,borderColor:cl,tension:.25},{label:"Views: Lula % do Bolsonaro",data:rv,borderColor:cb,tension:.25},{label:"Meta",data:lab.map(()=>t),borderColor:"#888",borderDash:[6,4],pointRadius:0}]},options:{plugins:{title:{display:true,text:"Hoje, a cada coleta"}}}});
- // histórico por dia
- const days=[...new Set(S.map(s=>s.day))].sort().reverse(),rows=days.map(day=>{
-  const e=S.filter(s=>s.day===day).pop(),b=baseline(S,day);
-  const pl=d(e,b,"lula","posts"),pb=d(e,b,"bolsonaro","posts"),vl=d(e,b,"lula","views"),vb=d(e,b,"bolsonaro","views");
-  const rp=pb>0?pl/pb*100:null,rv=vb>0?vl/vb*100:null;
-  const st=x=>x===null?"–":'<span class="'+(x>=t?"ok":"no")+'">'+x.toFixed(1)+"%</span>";
-  return "<tr><td>"+day.split("-").reverse().join("/")+(S.every(s=>s.day>=day)?" (parcial)":"")+"</td><td>"+fmt(pl)+" / "+fmt(pb)+"</td><td>"+st(rp)+"</td><td>"+fmt(vl)+" / "+fmt(vb)+"</td><td>"+st(rv)+"</td></tr>"});
- $("hist").innerHTML="<tr><th>Dia</th><th>Posts L / B</th><th>Posts %</th><th>Views L / B</th><th>Views %</th></tr>"+rows.join("");
- // aba volume: novos posts e views por snapshot (hoje) e por dia
- const dl=days.slice().reverse(),dp=dl.map(day=>{const e=S.filter(s=>s.day===day).pop(),b=baseline(S,day);return[d(e,b,"lula","posts"),d(e,b,"bolsonaro","posts"),d(e,b,"lula","views"),d(e,b,"bolsonaro","views")]});
- drawChart("c2",{type:"bar",data:{labels:dl,datasets:[{label:"Lula",data:dp.map(x=>x[0]),backgroundColor:cl},{label:"Bolsonaro",data:dp.map(x=>x[1]),backgroundColor:cb}]},options:{plugins:{title:{display:true,text:"Novos posts por dia"}}}});
- drawChart("c3",{type:"bar",data:{labels:dl,datasets:[{label:"Lula",data:dp.map(x=>x[2]),backgroundColor:cl},{label:"Bolsonaro",data:dp.map(x=>x[3]),backgroundColor:cb}]},options:{plugins:{title:{display:true,text:"Novas views por dia"}}}});
-}
-
-// aba por região (anúncios políticos da Meta, por estado)
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===b));$("meta").classList.toggle("hide",b.dataset.t!=="meta");$("vol").classList.toggle("hide",b.dataset.t!=="vol");render()});
-["plat","tgt"].forEach(i=>$(i).addEventListener("input",render));
-render();setTimeout(()=>location.reload(),30*60*1000);
+const hojeS=()=>dayOf(new Date());
+const dnum=a=>{const p=a.split("-").map(Number);return Date.UTC(p[0],p[1]-1,p[2])/864e5};
+const diasEntre=(a,b)=>Math.round(dnum(b)-dnum(a));
+function dados(){
+ const snap={};D0.forEach(r=>{(snap[r.ts]=snap[r.ts]||{lula:{posts:0,views:0},bolsonaro:{posts:0,views:0}});snap[r.ts][r.side].posts+=r.posts;snap[r.ts][r.side].views+=r.views});
+ const S=Object.keys(snap).sort().map(ts=>({ts,day:dayOf(ts),...snap[ts]}));
+ if(!S.length)return null;
+ const hoje=hojeS(),ontem=dayOf(new Date(Date.now()-864e5));
+ const base=(day)=>{const pv=S.filter(x=>x.day<day);return pv.length?pv[pv.length-1]:S.find(x=>x.day===day)};
+ const dd=(a,b,side,m)=>Math.max(0,a[side][m]-b[side][m]);
+ const share=(l,b)=>(l+b)>0?l/(l+b)*100:null;
+ const last=S[S.length-1],today=last.day,bs=base(today);
+ const V={l:dd(last,bs,"lula","views"),b:dd(last,bs,"bolsonaro","views")};
+ const rP=(()=>{const l=dd(last,bs,"lula","posts"),b=dd(last,bs,"bolsonaro","posts");return (l+b)>0?l/(l+b)*100:null})();
+ V.r=share(V.l,V.b);V.p=null;
+ if(S.some(x=>x.day===ontem)&&ontem<today){const e=S.filter(x=>x.day===ontem).pop(),b=base(ontem);V.p=share(dd(e,b,"lula","views"),dd(e,b,"bolsonaro","views"))}
+ const E={l:0,b:0,p:null};
+ PN.filter(r=>dayOf(r.ts)===today).forEach(r=>{E[r.side==="lula"?"l":"b"]+=r.new_eng});E.r=share(E.l,E.b);
+ if(ontem<today){const o={l:0,b:0};PN.filter(r=>dayOf(r.ts)===ontem).forEach(r=>{o[r.side==="lula"?"l":"b"]+=r.new_eng});E.p=share(o.l,o.b)}
+ if(V.r===null||E.r===null)return null;
+ const parts=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",hour12:false}).formatToParts(new Date());
+ const hora=+parts.find(x=>x.type==="hour").value%24;
+ const tags=[...new Set(D0.filter(r=>r.side==="lula").map(r=>r.tag))];
+ TAGS=tags.length?'<div class="chips">'+tags.map(t=>"<span>#"+t.replace(/[^\w]/g,"")+"</span>").join("")+"</div>":"";
+ return{rV:V.r,rE:E.r,pV:V.p,pE:E.p,V,E,T:60,D:diasEntre(hoje,ELEICAO),seed:Math.floor(dnum(hoje)),hora,theyPost:rP!==null&&rP<50}}
+function setT(t){document.documentElement.dataset.theme=t;document.getElementById('b-red').setAttribute('aria-pressed',t==='red');document.getElementById('b-br').setAttribute('aria-pressed',t==='br');try{localStorage.setItem('estilo',t)}catch(e){}}
+var t0='red';try{t0=localStorage.getItem('estilo')||'red'}catch(e){}if(location.hash.indexOf('br')>-1)t0='br';
+setT(t0);
+try{draw()}catch(e){console.error(e)}
+setTimeout(()=>location.reload(),30*60*1000);
 </script></body></html>
